@@ -132,6 +132,24 @@
                 { question: "What is Cardano's maximum supply of ADA?", options: ["21 million", "45 billion", "100 billion", "Unlimited"], correct: 1, explanation: "Cardano has a fixed maximum supply of 45 billion ADA." }
             ];
 
+            // Shuffle options for each question to vary correct answers
+            const shuffleOptions = (question) => {
+                const indices = [0, 1, 2, 3];
+                for (let i = indices.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [indices[i], indices[j]] = [indices[j], indices[i]];
+                }
+                
+                const newOptions = indices.map(i => question.options[i]);
+                const newCorrect = indices.indexOf(question.correct);
+                
+                return {
+                    ...question,
+                    options: newOptions,
+                    correct: newCorrect
+                };
+            };
+
             useEffect(() => {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
