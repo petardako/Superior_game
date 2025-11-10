@@ -16,7 +16,6 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // Icons
         const Gamepad2 = () => (
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/>
@@ -80,72 +79,52 @@
             const [leaderboard, setLeaderboard] = useState([]);
             const [totalScore, setTotalScore] = useState(0);
 
-            // 50 questions divided into 10 levels (5 per level)
             const allQuestions = [
-                // LEVEL 1 - Basics
                 { question: "What is Cardano?", options: ["A cryptocurrency", "A blockchain platform", "A wallet", "An exchange"], correct: 1, explanation: "Cardano is a third-generation blockchain platform designed for smart contracts and decentralized applications." },
                 { question: "What is the symbol of Cardano's cryptocurrency?", options: ["BTC", "ETH", "ADA", "DOT"], correct: 2, explanation: "ADA is Cardano's symbol, named after Ada Lovelace, the 19th-century mathematician." },
                 { question: "Who founded Cardano?", options: ["Vitalik Buterin", "Charles Hoskinson", "Gavin Wood", "Satoshi Nakamoto"], correct: 1, explanation: "Charles Hoskinson, co-founder of Ethereum, created Cardano with a scientific approach." },
                 { question: "What consensus algorithm does Cardano use?", options: ["Proof of Work", "Proof of Stake", "Proof of Authority", "Delegated PoS"], correct: 1, explanation: "Cardano uses Ouroboros, a Proof of Stake protocol that's energy efficient." },
                 { question: "What year was Cardano launched?", options: ["2015", "2017", "2019", "2021"], correct: 1, explanation: "Cardano was officially launched in September 2017." },
-                
-                // LEVEL 2 - Architecture
                 { question: "How many layers does Cardano's architecture have?", options: ["1", "2", "3", "4"], correct: 1, explanation: "Cardano has CSL (Settlement Layer) and CCL (Computation Layer)." },
                 { question: "What does CSL stand for?", options: ["Cardano Smart Layer", "Cardano Settlement Layer", "Cardano Security Layer", "Cardano System Layer"], correct: 1, explanation: "CSL handles ADA transactions and the ledger." },
                 { question: "What does CCL stand for?", options: ["Cardano Computing Layer", "Cardano Computation Layer", "Cardano Contract Layer", "Cardano Code Layer"], correct: 1, explanation: "CCL is responsible for smart contracts and dApps." },
                 { question: "What accounting model does Cardano use?", options: ["Account-based", "UTXO", "Balance-based", "Token-based"], correct: 1, explanation: "Cardano uses Extended UTXO (eUTXO) model for better security." },
                 { question: "What makes Cardano's UTXO model unique?", options: ["It's faster", "It's extended (eUTXO)", "It's cheaper", "It's simpler"], correct: 1, explanation: "eUTXO adds smart contract capabilities to Bitcoin's UTXO model." },
-                
-                // LEVEL 3 - Smart Contracts
                 { question: "What programming language does Cardano use for smart contracts?", options: ["Solidity", "Rust", "Plutus", "JavaScript"], correct: 2, explanation: "Plutus is based on Haskell and designed for formal verification." },
                 { question: "What update brought smart contracts to Cardano?", options: ["Shelley", "Alonzo", "Goguen", "Basho"], correct: 1, explanation: "The Alonzo hard fork in September 2021 enabled smart contracts." },
                 { question: "What language is Plutus based on?", options: ["Python", "Java", "Haskell", "C++"], correct: 2, explanation: "Plutus is built on Haskell, a functional programming language." },
                 { question: "What is Marlowe?", options: ["A wallet", "A language for financial contracts", "An exchange", "A token"], correct: 1, explanation: "Marlowe is a domain-specific language for financial smart contracts." },
                 { question: "What's the advantage of functional programming for smart contracts?", options: ["It's faster", "Better formal verification", "Easier to learn", "More popular"], correct: 1, explanation: "Functional programming allows mathematical proof of correctness." },
-                
-                // LEVEL 4 - Staking
                 { question: "What is a Stake Pool?", options: ["A mining pool", "A validator node", "A wallet type", "A token"], correct: 1, explanation: "Stake Pools validate transactions and produce blocks on Cardano." },
                 { question: "What is delegation in Cardano?", options: ["Sending ADA", "Assigning stake to a pool", "Creating a wallet", "Mining"], correct: 1, explanation: "Delegation allows ADA holders to participate in staking without running a node." },
                 { question: "Do you lose control of your ADA when staking?", options: ["Yes, completely", "No, ADA stays in your wallet", "Only partially", "Depends on the pool"], correct: 1, explanation: "Your ADA never leaves your wallet when delegating to a stake pool." },
                 { question: "What is an epoch in Cardano?", options: ["1 day", "5 days", "1 month", "1 year"], correct: 1, explanation: "An epoch is approximately 5 days (432,000 slots)." },
                 { question: "What are staking rewards paid in?", options: ["Bitcoin", "Ethereum", "ADA", "USD"], correct: 2, explanation: "Staking rewards are paid in ADA from transaction fees and monetary expansion." },
-                
-                // LEVEL 5 - Governance
                 { question: "What is Project Catalyst?", options: ["A wallet", "A governance system", "A DEX", "A bridge"], correct: 1, explanation: "Project Catalyst is Cardano's decentralized governance and funding mechanism." },
                 { question: "How do you vote in Catalyst?", options: ["With ADA holdings", "One person one vote", "Through stake pools", "By mining"], correct: 0, explanation: "Voting power in Catalyst is proportional to ADA holdings." },
                 { question: "What are Catalyst proposals called?", options: ["Projects", "Ideas", "Proposals", "All of the above"], correct: 3, explanation: "They're commonly called proposals or projects seeking funding." },
                 { question: "What does CIP stand for?", options: ["Cardano Implementation Proposal", "Cardano Improvement Proposal", "Cardano Innovation Protocol", "Cardano Investment Plan"], correct: 1, explanation: "CIPs are formal proposals for improving Cardano's protocol." },
                 { question: "Who can submit a CIP?", options: ["Only developers", "Only IOHK", "Anyone in the community", "Only stake pool operators"], correct: 2, explanation: "CIPs are open to anyone in the Cardano community." },
-                
-                // LEVEL 6 - Development Phases
                 { question: "What was the Byron era about?", options: ["Foundation", "Decentralization", "Smart contracts", "Scaling"], correct: 0, explanation: "Byron established Cardano's foundation and basic functionality." },
                 { question: "What did Shelley bring to Cardano?", options: ["Smart contracts", "Decentralization", "Scaling", "Governance"], correct: 1, explanation: "Shelley enabled decentralized block production through stake pools." },
                 { question: "What is the Goguen era focused on?", options: ["Decentralization", "Smart contracts", "Scaling", "Interoperability"], correct: 1, explanation: "Goguen brought smart contract capabilities via Plutus and Marlowe." },
                 { question: "What will Basho improve?", options: ["Security", "Decentralization", "Scaling and optimization", "Governance"], correct: 2, explanation: "Basho focuses on scaling through sidechains and optimization." },
                 { question: "What is Voltaire about?", options: ["Smart contracts", "Scaling", "Governance and sustainability", "Interoperability"], correct: 2, explanation: "Voltaire will complete Cardano's self-governing system." },
-                
-                // LEVEL 7 - Technology
                 { question: "What is Hydra?", options: ["A wallet", "A layer 2 scaling solution", "A staking protocol", "A DEX"], correct: 1, explanation: "Hydra is Cardano's layer 2 protocol for massive scalability." },
                 { question: "What is Mithril?", options: ["A token", "A stake-based signature scheme", "A wallet", "A DEX"], correct: 1, explanation: "Mithril enables fast bootstrapping and light clients." },
                 { question: "What are Native Assets?", options: ["Tokens requiring smart contracts", "First-class tokens on Cardano", "NFTs only", "Stablecoins"], correct: 1, explanation: "Native Assets are treated like ADA at the protocol level." },
                 { question: "Do Native Assets require smart contracts?", options: ["Yes, always", "No, they're built-in", "Only for complex tokens", "Depends on the type"], correct: 1, explanation: "Native Assets are handled by the ledger itself, no smart contracts needed." },
                 { question: "What is a Cardano sidechain?", options: ["A layer 2 solution", "A separate blockchain", "Both A and B", "A wallet type"], correct: 2, explanation: "Sidechains are independent blockchains connected to Cardano's mainchain." },
-                
-                // LEVEL 8 - Organizations
                 { question: "Which three organizations develop Cardano?", options: ["IOG, CF, Emurgo", "IOHK, Binance, Coinbase", "IOG, Ethereum, Polkadot", "Only IOHK"], correct: 0, explanation: "Input Output (IOG), Cardano Foundation, and Emurgo collaborate on development." },
                 { question: "What is IOG's role?", options: ["Marketing only", "Research and development", "Only funding", "Running stake pools"], correct: 1, explanation: "IOG (formerly IOHK) handles research, development, and engineering." },
                 { question: "What does the Cardano Foundation do?", options: ["Development", "Adoption and standards", "Mining", "Trading"], correct: 1, explanation: "The Foundation oversees ecosystem development and adoption." },
                 { question: "What is Emurgo's focus?", options: ["Research", "Commercial adoption", "Governance", "Mining"], correct: 1, explanation: "Emurgo focuses on commercial ventures and enterprise adoption." },
                 { question: "Is Cardano development centralized?", options: ["Yes, only IOHK", "No, multiple organizations", "Yes, fully centralized", "No governance exists"], correct: 1, explanation: "Three entities plus community governance ensure decentralization." },
-                
-                // LEVEL 9 - Advanced Concepts
                 { question: "What is Ouroboros Praos?", options: ["A wallet", "An improved consensus protocol", "A DEX", "A token"], correct: 1, explanation: "Praos is an enhanced version of Ouroboros with better security." },
                 { question: "What does 'peer-reviewed' mean for Cardano?", options: ["Fast development", "Academic scrutiny", "Community voting", "No testing needed"], correct: 1, explanation: "Cardano's research undergoes academic peer review before implementation." },
                 { question: "What is Atala PRISM?", options: ["A wallet", "A decentralized identity solution", "A DEX", "A game"], correct: 1, explanation: "Atala PRISM is Cardano's self-sovereign identity solution." },
                 { question: "What are Cardano Improvement Proposals (CIPs)?", options: ["Bug reports", "Formal improvement suggestions", "Marketing plans", "Trading strategies"], correct: 1, explanation: "CIPs are standardized proposals for protocol improvements." },
                 { question: "What is determinism in Plutus?", options: ["Random outcomes", "Predictable execution costs", "Faster execution", "Lower fees"], correct: 1, explanation: "Plutus scripts have predictable costs before execution." },
-                
-                // LEVEL 10 - Ecosystem & Future
                 { question: "What is a dApp on Cardano?", options: ["A mobile app", "A decentralized application", "A wallet", "A token"], correct: 1, explanation: "dApps run on blockchain without centralized control." },
                 { question: "What is the Cardano treasury?", options: ["IOG's funds", "Community-controlled fund", "A wallet", "An exchange"], correct: 1, explanation: "The treasury funds community projects through Catalyst." },
                 { question: "Where does treasury funding come from?", options: ["Transaction fees only", "Donations", "Fees + monetary expansion", "Mining"], correct: 2, explanation: "Treasury is funded by a portion of transaction fees and monetary expansion." },
@@ -168,7 +147,6 @@
             };
 
             useEffect(() => {
-                // Get Telegram user info
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
                     tg.ready();
@@ -187,7 +165,6 @@
                 loadLeaderboard();
             }, []);
 
-            // Timer effect
             useEffect(() => {
                 let interval;
                 if (gameState === 'playing' && startTime) {
@@ -235,9 +212,7 @@
                                 lastPlayed: Date.now()
                             };
                         }
-                    } catch (e) {
-                        // New player
-                    }
+                    } catch (e) {}
                     
                     await window.storage.set(playerKey, JSON.stringify(playerData), true);
                     loadLeaderboard();
@@ -266,15 +241,11 @@
                 
                 if (correct) {
                     let points = 100;
-                    // Speed bonus: faster = more points
                     if (timeElapsed < 3) points += 100;
                     else if (timeElapsed < 5) points += 50;
                     else if (timeElapsed < 10) points += 25;
                     
-                    // Streak bonus
                     points += streak * 10;
-                    
-                    // Level multiplier
                     points = Math.floor(points * (1 + (level - 1) * 0.1));
                     
                     setScore(score + points);
@@ -416,4 +387,272 @@
                                     ))}
                                     {[...Array(10 - level)].map((_, i) => (
                                         <div key={i} className="w-5 h-5 text-gray-300"><Star filled={false} /></div>
-                                    
+                                    ))}
+                                </div>
+                                <span className="text-sm font-semibold text-gray-600">Level {level}/10</span>
+                            </div>
+
+                            {streak > 0 && (
+                                <div className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white px-4 py-2 rounded-lg mb-4 text-center flex items-center justify-center gap-2">
+                                    <div className="w-4 h-4"><Zap /></div>
+                                    <span className="font-bold">Streak x{streak}!</span>
+                                </div>
+                            )}
+
+                            <div className="mb-6">
+                                <span className="bg-blue-100 text-blue-600 px-3 py-1 rounded-full text-sm font-semibold">
+                                    Question {questionsInLevel + 1}/5
+                                </span>
+                            </div>
+
+                            <h2 className="text-2xl font-bold text-gray-800 mb-6">{q.question}</h2>
+
+                            <div className="space-y-3">
+                                {q.options.map((option, index) => (
+                                    <button
+                                        key={index}
+                                        onClick={() => handleAnswer(index)}
+                                        className="w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 transition-all font-medium text-gray-700"
+                                    >
+                                        <span className="inline-block w-8 h-8 rounded-full bg-blue-100 text-blue-600 text-center leading-8 mr-3 font-bold">
+                                            {String.fromCharCode(65 + index)}
+                                        </span>
+                                        {option}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderFeedback = (isCorrect) => {
+                const questions = getLevelQuestions(level);
+                const q = questions[currentQuestion];
+                return (
+                    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                        <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full text-center">
+                            <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center mb-4 ${
+                                isCorrect ? 'bg-green-100' : 'bg-red-100'
+                            }`}>
+                                {isCorrect ? (
+                                    <div className="w-12 h-12 text-green-600"><Trophy /></div>
+                                ) : (
+                                    <span className="text-4xl">✗</span>
+                                )}
+                            </div>
+
+                            <h2 className={`text-3xl font-bold mb-4 ${isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                                {isCorrect ? 'Correct!' : 'Incorrect'}
+                            </h2>
+
+                            <div className="bg-blue-50 rounded-xl p-6 mb-6 text-left">
+                                <p className="text-sm text-gray-600 mb-2">📚 Explanation:</p>
+                                <p className="text-gray-800">{q.explanation}</p>
+                            </div>
+
+                            <button
+                                onClick={nextQuestion}
+                                className="bg-gradient-to-r from-blue-600 to-cyan-600 text-white px-8 py-3 rounded-xl font-bold hover:from-blue-700 hover:to-cyan-700 transition-all"
+                            >
+                                Next Question →
+                            </button>
+                        </div>
+                    </div>
+                );
+            };
+
+            const renderLevelUp = () => (
+                <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+                        <div className="w-24 h-24 mx-auto mb-6 animate-bounce">
+                            <div className="text-yellow-500"><Trophy /></div>
+                        </div>
+                        
+                        <h2 className="text-4xl font-bold text-gray-800 mb-4">Level {level} Complete! 🎉</h2>
+                        
+                        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 mb-6">
+                            <p className="text-5xl font-bold text-blue-600 mb-2">{score}</p>
+                            <p className="text-gray-600 mb-4">Level Score</p>
+                            
+                            <div className="flex gap-1 justify-center mb-4">
+                                {[...Array(level)].map((_, i) => (
+                                    <div key={i} className="w-6 h-6 text-yellow-500"><Star filled={true} /></div>
+                                ))}
+                            </div>
+                            
+                            {level < 10 && (
+                                <p className="text-gray-700 font-semibold">
+                                    Ready for Level {level + 1}? 🚀
+                                </p>
+                            )}
+                        </div>
+
+                        <button
+                            onClick={goToNextLevel}
+                            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-xl font-bold text-lg hover:from-blue-700 hover:to-cyan-700 transition-all transform hover:scale-105 shadow-lg"
+                        >
+                            Continue to Level {level + 1}!
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderGameOver = () => (
+                <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+                        <h2 className="text-4xl font-bold text-gray-800 mb-4">Game Over</h2>
+                        <p className="text-gray-600 mb-2">Great effort, @{playerName}!</p>
+                        <p className="text-gray-600 mb-6">You reached Level {level}</p>
+                        
+                        <div className="bg-gradient-to-r from-blue-50 to-cyan-50 rounded-xl p-6 mb-6">
+                            <p className="text-5xl font-bold text-blue-600 mb-2">{totalScore}</p>
+                            <p className="text-gray-600 mb-3">Total Points</p>
+                            
+                            <div className="flex gap-1 justify-center">
+                                {[...Array(level)].map((_, i) => (
+                                    <div key={i} className="w-6 h-6 text-yellow-500"><Star filled={true} /></div>
+                                ))}
+                                {[...Array(10 - level)].map((_, i) => (
+                                    <div key={i} className="w-6 h-6 text-gray-300"><Star filled={false} /></div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={() => setGameState('leaderboard')}
+                            className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-3 rounded-xl font-bold mb-3 hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center gap-2"
+                        >
+                            <div className="w-5 h-5"><Users /></div>
+                            View Leaderboard
+                        </button>
+
+                        <button
+                            onClick={() => setGameState('menu')}
+                            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-cyan-700 transition-all"
+                        >
+                            Play Again
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderVictory = () => (
+                <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
+                        <div className="w-32 h-32 mx-auto text-yellow-500 mb-6 animate-pulse"><Trophy /></div>
+                        <h2 className="text-5xl font-bold text-gray-800 mb-4">CHAMPION! 👑</h2>
+                        <p className="text-xl text-gray-700 mb-2">Congratulations, @{playerName}!</p>
+                        <p className="text-gray-600 mb-6">You completed all 10 levels!</p>
+                        
+                        <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 mb-6">
+                            <p className="text-6xl font-bold text-blue-600 mb-3">{totalScore}</p>
+                            <p className="text-gray-600 mb-4">Total Score</p>
+                            
+                            <div className="flex gap-1 justify-center mb-4">
+                                {[...Array(10)].map((_, i) => (
+                                    <div key={i} className="w-6 h-6 text-yellow-500"><Star filled={true} /></div>
+                                ))}
+                            </div>
+                            
+                            <p className="text-lg font-bold text-gray-800">🎓 Cardano Master!</p>
+                        </div>
+
+                        <button
+                            onClick={() => setGameState('leaderboard')}
+                            className="w-full bg-gradient-to-r from-yellow-500 to-orange-500 text-white py-4 rounded-xl font-bold mb-3 hover:from-yellow-600 hover:to-orange-600 transition-all flex items-center justify-center gap-2"
+                        >
+                            <div className="w-5 h-5"><Users /></div>
+                            View Leaderboard
+                        </button>
+
+                        <button
+                            onClick={() => setGameState('menu')}
+                            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-4 rounded-xl font-bold hover:from-blue-700 hover:to-cyan-700 transition-all"
+                        >
+                            Play Again
+                        </button>
+                    </div>
+                </div>
+            );
+
+            const renderLeaderboard = () => (
+                <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                    <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
+                        <div className="text-center mb-6">
+                            <div className="w-16 h-16 mx-auto text-yellow-500 mb-4"><Trophy /></div>
+                            <h2 className="text-3xl font-bold text-gray-800">Global Leaderboard</h2>
+                            <p className="text-gray-600 text-sm">Top Cardano Masters</p>
+                        </div>
+
+                        <div className="space-y-3 mb-6 max-h-96 overflow-y-auto">
+                            {leaderboard.length === 0 ? (
+                                <div className="text-center text-gray-500 py-8">
+                                    <p>No players yet!</p>
+                                    <p className="text-sm">Be the first to play!</p>
+                                </div>
+                            ) : (
+                                leaderboard.map((player, index) => (
+                                    <div key={index} className={`flex items-center justify-between p-4 rounded-xl ${
+                                        index === 0 ? 'bg-gradient-to-r from-yellow-100 to-orange-100 border-2 border-yellow-400' :
+                                        index === 1 ? 'bg-gradient-to-r from-gray-100 to-gray-200 border-2 border-gray-400' :
+                                        index === 2 ? 'bg-gradient-to-r from-orange-100 to-yellow-100 border-2 border-orange-400' :
+                                        'bg-gray-50'
+                                    }`}>
+                                        <div className="flex items-center gap-3">
+                                            <span className={`text-2xl font-bold ${
+                                                index === 0 ? 'text-yellow-600' :
+                                                index === 1 ? 'text-gray-600' :
+                                                index === 2 ? 'text-orange-600' :
+                                                'text-gray-400'
+                                            }`}>
+                                                {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`}
+                                            </span>
+                                            <div>
+                                                <p className="font-bold text-gray-800">@{player.name}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    Level {player.maxLevel} • {player.gamesPlayed} games
+                                                </p>
+                                            </div>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xl font-bold text-blue-600">{player.totalScore}</p>
+                                            <div className="flex gap-0.5 justify-end">
+                                                {[...Array(Math.min(player.maxLevel, 5))].map((_, i) => (
+                                                    <div key={i} className="w-3 h-3 text-yellow-500"><Star filled={true} /></div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+
+                        <button
+                            onClick={() => setGameState('menu')}
+                            className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 text-white py-3 rounded-xl font-bold hover:from-blue-700 hover:to-cyan-700 transition-all"
+                        >
+                            Back to Menu
+                        </button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <>
+                    {gameState === 'menu' && renderMenu()}
+                    {gameState === 'playing' && renderPlaying()}
+                    {gameState === 'correct' && renderFeedback(true)}
+                    {gameState === 'incorrect' && renderFeedback(false)}
+                    {gameState === 'levelup' && renderLevelUp()}
+                    {gameState === 'gameover' && renderGameOver()}
+                    {gameState === 'victory' && renderVictory()}
+                    {gameState === 'leaderboard' && renderLeaderboard()}
+                </>
+            );
+        };
+
+        ReactDOM.render(<SuperiorGame />, document.getElementById('root'));
+    </script>
+</body>
+</html>
