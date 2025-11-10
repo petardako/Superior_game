@@ -210,27 +210,57 @@
             const savePlayerScore = async (name, score, level) => {
                 try {
                     const userId = telegramUser?.id || name.toLowerCase().replace(/\s/g, '_');
-                    const playerKey = `player:${userId}`;
-                    let playerData = { name, totalScore: score, maxLevel: level, gamesPlayed: 1, lastPlayed: Date.now() };
                     
-                    try {
-                        const existing = await window.storage.get(playerKey, true);
-                        if (existing) {
-                            const oldData = JSON.parse(existing.value);
-                            playerData = {
-                                name,
-                                totalScore: oldData.totalScore + score,
-                                maxLevel: Math.max(oldData.maxLevel, level),
-                                gamesPlayed: oldData.gamesPlayed + 1,
-                                lastPlayed: Date.now()
-                            };
-                        }
-                    } catch (e) {}
+                    // Intentar usar storage de Claude primero
+                    if (window.storage) {
+                        const playerKey = `player:${userId}`;
+                        let playerData = { name, totalScore: score, maxLevel: level, gamesPlayed: 1, lastPlayed: Date.now() };
+                        
+                        try {
+                            const existing = await window.storage.get(playerKey, true);
+                            if (existing) {
+                                const oldData = JSON.parse(existing.value);
+                                playerData = {
+                                    name,
+                                    totalScore: oldData.totalScore + score,
+                                    maxLevel: Math.max(oldData.maxLevel, level),
+                                    gamesPlayed: oldData.gamesPlayed + 1,
+                                    lastPlayed: Date.now()
+                                };
+                            }
+                        } catch (e) {}
+                        
+                        await window.storage.set(playerKey, JSON.stringify(playerData), true);
+                        loadLeaderboard();
+                        return;
+                    }
                     
-                    await window.storage.set(playerKey, JSON.stringify(playerData), true);
+                    // Fallback a localStorage
+                    const localData = localStorage.getItem('superiorGameLeaderboard');
+                    let players = localData ? JSON.parse(localData) : [];
+                    
+                    const existingIndex = players.findIndex(p => p.id === userId);
+                    
+                    if (existingIndex >= 0) {
+                        players[existingIndex].totalScore += score;
+                        players[existingIndex].maxLevel = Math.max(players[existingIndex].maxLevel, level);
+                        players[existingIndex].gamesPlayed += 1;
+                        players[existingIndex].lastPlayed = Date.now();
+                    } else {
+                        players.push({
+                            id: userId,
+                            name,
+                            totalScore: score,
+                            maxLevel: level,
+                            gamesPlayed: 1,
+                            lastPlayed: Date.now()
+                        });
+                    }
+                    
+                    localStorage.setItem('superiorGameLeaderboard', JSON.stringify(players));
                     loadLeaderboard();
                 } catch (error) {
-                    console.log('Could not save score');
+                    console.log('Could not save score:', error);
                 }
             };
 
