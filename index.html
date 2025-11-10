@@ -142,8 +142,10 @@
             };
 
             const generateLevelQuestions = (lvl) => {
-                const shuffled = shuffleArray(allQuestions);
-                return shuffled.slice((lvl - 1) % 10 * 5, ((lvl - 1) % 10 * 5) + 5);
+                const shuffled = shuffleArray([...allQuestions]);
+                const start = ((lvl - 1) % 10) * 5;
+                const end = start + 5;
+                return shuffled.slice(start, end);
             };
 
             useEffect(() => {
@@ -164,18 +166,6 @@
                 
                 loadLeaderboard();
             }, []);
-
-            useEffect(() => {
-                let interval;
-                if (gameState === 'playing' && startTime) {
-                    interval = setInterval(() => {
-                        setCurrentTime(Date.now());
-                    }, 100);
-                }
-                return () => {
-                    if (interval) clearInterval(interval);
-                };
-            }, [gameState, startTime]);
 
             const loadLeaderboard = async () => {
                 try {
@@ -225,6 +215,7 @@
 
             const startGame = () => {
                 const questions = generateLevelQuestions(1);
+                console.log('Starting game with questions:', questions);
                 setLevelQuestions(questions);
                 setGameState('playing');
                 setScore(0);
@@ -234,12 +225,11 @@
                 setQuestionsInLevel(0);
                 setStreak(0);
                 setStartTime(Date.now());
-                setCurrentTime(Date.now());
                 setTotalScore(0);
             };
 
             const handleAnswer = (selectedIndex) => {
-                const timeElapsed = (currentTime - startTime) / 1000;
+                const timeElapsed = (Date.now() - startTime) / 1000;
                 const correct = levelQuestions[currentQuestion].correct === selectedIndex;
                 
                 if (correct) {
@@ -287,7 +277,6 @@
                     setCurrentQuestion(currentQuestion + 1);
                     setGameState('playing');
                     setStartTime(Date.now());
-                    setCurrentTime(Date.now());
                 }
             };
 
@@ -299,7 +288,6 @@
                 setCurrentQuestion(0);
                 setGameState('playing');
                 setStartTime(Date.now());
-                setCurrentTime(Date.now());
             };
 
             const renderMenu = () => (
@@ -359,10 +347,28 @@
             );
 
             const renderPlaying = () => {
-                if (!levelQuestions || levelQuestions.length === 0) return null;
+                if (!levelQuestions || levelQuestions.length === 0) {
+                    return (
+                        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
+                                <p className="text-gray-600">Loading questions...</p>
+                            </div>
+                        </div>
+                    );
+                }
+                
                 const q = levelQuestions[currentQuestion];
-                if (!q) return null;
-                const timeElapsed = startTime ? ((currentTime - startTime) / 1000).toFixed(1) : 0;
+                if (!q) {
+                    return (
+                        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
+                            <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
+                                <p className="text-gray-600">Loading question...</p>
+                            </div>
+                        </div>
+                    );
+                }
+
+                return (
 
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
@@ -378,7 +384,7 @@
                                 <div className="text-center">
                                     <div className="flex items-center gap-2 text-blue-600">
                                         <div className="w-4 h-4"><Clock /></div>
-                                        <span className="font-bold text-lg">{timeElapsed}s</span>
+                                        <span className="font-bold text-lg">⚡</span>
                                     </div>
                                 </div>
                                 <div className="text-right">
