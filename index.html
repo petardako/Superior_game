@@ -75,7 +75,6 @@
             const [questionsInLevel, setQuestionsInLevel] = useState(0);
             const [streak, setStreak] = useState(0);
             const [startTime, setStartTime] = useState(null);
-            const [currentTime, setCurrentTime] = useState(0);
             const [leaderboard, setLeaderboard] = useState([]);
             const [totalScore, setTotalScore] = useState(0);
             const [levelQuestions, setLevelQuestions] = useState([]);
@@ -142,7 +141,7 @@
                 return shuffled;
             };
 
-            const getLevelQuestions = (lvl) => {
+            const generateLevelQuestions = (lvl) => {
                 const shuffled = shuffleArray(allQuestions);
                 return shuffled.slice((lvl - 1) % 10 * 5, ((lvl - 1) % 10 * 5) + 5);
             };
@@ -225,6 +224,8 @@
             };
 
             const startGame = () => {
+                const questions = generateLevelQuestions(1);
+                setLevelQuestions(questions);
                 setGameState('playing');
                 setScore(0);
                 setLives(3);
@@ -239,8 +240,7 @@
 
             const handleAnswer = (selectedIndex) => {
                 const timeElapsed = (currentTime - startTime) / 1000;
-                const questions = getLevelQuestions(level);
-                const correct = questions[currentQuestion].correct === selectedIndex;
+                const correct = levelQuestions[currentQuestion].correct === selectedIndex;
                 
                 if (correct) {
                     let points = 100;
@@ -292,7 +292,10 @@
             };
 
             const goToNextLevel = () => {
-                setLevel(level + 1);
+                const newLevel = level + 1;
+                const questions = generateLevelQuestions(newLevel);
+                setLevelQuestions(questions);
+                setLevel(newLevel);
                 setCurrentQuestion(0);
                 setGameState('playing');
                 setStartTime(Date.now());
@@ -356,8 +359,9 @@
             );
 
             const renderPlaying = () => {
-                const questions = getLevelQuestions(level);
-                const q = questions[currentQuestion];
+                if (!levelQuestions || levelQuestions.length === 0) return null;
+                const q = levelQuestions[currentQuestion];
+                if (!q) return null;
                 const timeElapsed = startTime ? ((currentTime - startTime) / 1000).toFixed(1) : 0;
 
                 return (
@@ -430,8 +434,9 @@
             };
 
             const renderFeedback = (isCorrect) => {
-                const questions = getLevelQuestions(level);
-                const q = questions[currentQuestion];
+                if (!levelQuestions || levelQuestions.length === 0) return null;
+                const q = levelQuestions[currentQuestion];
+                if (!q) return null;
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full text-center">
