@@ -132,22 +132,6 @@
                 { question: "What is Cardano's maximum supply of ADA?", options: ["21 million", "45 billion", "100 billion", "Unlimited"], correct: 1, explanation: "Cardano has a fixed maximum supply of 45 billion ADA." }
             ];
 
-            const shuffleArray = (array) => {
-                const shuffled = [...array];
-                for (let i = shuffled.length - 1; i > 0; i--) {
-                    const j = Math.floor(Math.random() * (i + 1));
-                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-                }
-                return shuffled;
-            };
-
-            const generateLevelQuestions = (lvl) => {
-                const shuffled = shuffleArray([...allQuestions]);
-                const start = ((lvl - 1) % 10) * 5;
-                const end = start + 5;
-                return shuffled.slice(start, end);
-            };
-
             useEffect(() => {
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
@@ -213,9 +197,18 @@
                 }
             };
 
+            const shuffleArray = (array) => {
+                const shuffled = [...array];
+                for (let i = shuffled.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+                }
+                return shuffled;
+            };
+
             const startGame = () => {
-                const questions = generateLevelQuestions(1);
-                console.log('Starting game with questions:', questions);
+                const shuffled = shuffleArray([...allQuestions]);
+                const questions = shuffled.slice(0, 5);
                 setLevelQuestions(questions);
                 setGameState('playing');
                 setScore(0);
@@ -243,8 +236,7 @@
                     
                     setScore(score + points);
                     setTotalScore(totalScore + points);
-                    const newStreak = streak + 1;
-                    setStreak(newStreak);
+                    setStreak(streak + 1);
                     setGameState('correct');
                 } else {
                     setLives(lives - 1);
@@ -282,7 +274,8 @@
 
             const goToNextLevel = () => {
                 const newLevel = level + 1;
-                const questions = generateLevelQuestions(newLevel);
+                const shuffled = shuffleArray([...allQuestions]);
+                const questions = shuffled.slice(0, 5);
                 setLevelQuestions(questions);
                 setLevel(newLevel);
                 setCurrentQuestion(0);
@@ -347,28 +340,17 @@
             );
 
             const renderPlaying = () => {
-                if (!levelQuestions || levelQuestions.length === 0) {
+                if (!levelQuestions || levelQuestions.length === 0 || !levelQuestions[currentQuestion]) {
                     return (
                         <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                             <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
-                                <p className="text-gray-600">Loading questions...</p>
-                            </div>
-                        </div>
-                    );
-                }
-                
-                const q = levelQuestions[currentQuestion];
-                if (!q) {
-                    return (
-                        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
-                            <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
-                                <p className="text-gray-600">Loading question...</p>
+                                <p className="text-gray-600">Loading...</p>
                             </div>
                         </div>
                     );
                 }
 
-                return (
+                const q = levelQuestions[currentQuestion];
 
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
@@ -440,9 +422,9 @@
             };
 
             const renderFeedback = (isCorrect) => {
-                if (!levelQuestions || levelQuestions.length === 0) return null;
+                if (!levelQuestions || !levelQuestions[currentQuestion]) return null;
                 const q = levelQuestions[currentQuestion];
-                if (!q) return null;
+                
                 return (
                     <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                         <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-2xl w-full text-center">
