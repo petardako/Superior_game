@@ -172,20 +172,38 @@
 
             const loadLeaderboard = async () => {
                 try {
-                    const result = await window.storage.list('player:', true);
-                    if (result && result.keys) {
-                        const players = await Promise.all(
-                            result.keys.map(async (key) => {
-                                const data = await window.storage.get(key, true);
-                                return data ? JSON.parse(data.value) : null;
-                            })
-                        );
-                        const validPlayers = players.filter(p => p !== null);
-                        validPlayers.sort((a, b) => b.totalScore - a.totalScore);
-                        setLeaderboard(validPlayers.slice(0, 10));
+                    // Intentar usar storage de Claude primero
+                    if (window.storage) {
+                        const result = await window.storage.list('player:', true);
+                        if (result && result.keys) {
+                            const players = await Promise.all(
+                                result.keys.map(async (key) => {
+                                    const data = await window.storage.get(key, true);
+                                    return data ? JSON.parse(data.value) : null;
+                                })
+                            );
+                            const validPlayers = players.filter(p => p !== null);
+                            validPlayers.sort((a, b) => b.totalScore - a.totalScore);
+                            setLeaderboard(validPlayers.slice(0, 10));
+                            return;
+                        }
+                    }
+                    
+                    // Fallback a localStorage
+                    const localData = localStorage.getItem('superiorGameLeaderboard');
+                    if (localData) {
+                        const players = JSON.parse(localData);
+                        players.sort((a, b) => b.totalScore - a.totalScore);
+                        setLeaderboard(players.slice(0, 10));
                     }
                 } catch (error) {
-                    console.log('Leaderboard not available yet');
+                    console.log('Loading from localStorage');
+                    const localData = localStorage.getItem('superiorGameLeaderboard');
+                    if (localData) {
+                        const players = JSON.parse(localData);
+                        players.sort((a, b) => b.totalScore - a.totalScore);
+                        setLeaderboard(players.slice(0, 10));
+                    }
                 }
             };
 
@@ -303,7 +321,7 @@
                 <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
                         <div className="text-center mb-6">
-                            <div className="w-20 h-20 mx-auto text-blue-600 mb-4"><Gamepad2 /></div>
+                            <img src="https://TU-URL-DE-IMAGEN-AQUI.jpg" alt="Logo" className="w-20 h-20 mx-auto rounded-full mb-4 object-cover" />
                             <h1 className="text-4xl font-bold text-gray-800 mb-2">SUPERIOR GAME</h1>
                             <p className="text-gray-600">Master Cardano - 10 Levels Challenge</p>
                             {playerName && (
