@@ -224,9 +224,11 @@
                             const existing = await window.storage.get(playerKey, true);
                             if (existing) {
                                 const oldData = JSON.parse(existing.value);
+                                // Solo guardar si es un nuevo récord
+                                const newHighScore = Math.max(oldData.totalScore, score);
                                 playerData = {
                                     name,
-                                    totalScore: oldData.totalScore + score,
+                                    totalScore: newHighScore,
                                     maxLevel: Math.max(oldData.maxLevel, level),
                                     gamesPlayed: oldData.gamesPlayed + 1,
                                     lastPlayed: Date.now()
@@ -246,7 +248,9 @@
                     const existingIndex = players.findIndex(p => p.id === userId);
                     
                     if (existingIndex >= 0) {
-                        players[existingIndex].totalScore += score;
+                        // Solo actualizar si es un nuevo récord
+                        const newHighScore = Math.max(players[existingIndex].totalScore, score);
+                        players[existingIndex].totalScore = newHighScore;
                         players[existingIndex].maxLevel = Math.max(players[existingIndex].maxLevel, level);
                         players[existingIndex].gamesPlayed += 1;
                         players[existingIndex].lastPlayed = Date.now();
@@ -269,14 +273,44 @@
             };
 
             const startGame = () => {
-                // Mezclar todas las preguntas y seleccionar 50 únicas para toda la partida
+                // Mezclar todas las preguntas
                 const shuffled = shuffleArray(allQuestions);
-                const gameQuestions = shuffled.map(q => shuffleQuestionOptions(q));
+                
+                // Eliminar duplicados basados en el texto de la pregunta
+                const uniqueQuestions = [];
+                const seenQuestions = new Set();
+                
+                for (const q of shuffled) {
+                    if (!seenQuestions.has(q.question)) {
+                        uniqueQuestions.push(q);
+                        seenQuestions.add(q.question);
+                    }
+                }
+                
+                // IMPORTANTE: Asegurar que la pregunta de meme coins esté incluida (95% probabilidad)
+                const memeQuestion = { 
+                    question: "Which meme coins help grow the Cardano ecosystem?", 
+                    options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], 
+                    correct: 3, 
+                    explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." 
+                };
+                
+                // Verificar si ya está en las preguntas únicas
+                const hasMemeQuestion = uniqueQuestions.some(q => q.question === memeQuestion.question);
+                
+                // Si no está, añadirla en una posición aleatoria temprana (95% de probabilidad)
+                if (!hasMemeQuestion && Math.random() < 0.95) {
+                    const insertPosition = Math.floor(Math.random() * Math.min(20, uniqueQuestions.length));
+                    uniqueQuestions.splice(insertPosition, 0, memeQuestion);
+                }
+                
+                // Mezclar las opciones de cada pregunta
+                const gameQuestions = uniqueQuestions.map(q => shuffleQuestionOptions(q));
                 
                 // Tomar las primeras 5 para el nivel 1
                 const questions = gameQuestions.slice(0, 5);
                 setLevelQuestions(questions);
-                setUsedQuestions(gameQuestions); // Guardar todas las preguntas para la partida
+                setUsedQuestions(gameQuestions);
                 setGameState('playing');
                 setScore(0);
                 setLives(3);
