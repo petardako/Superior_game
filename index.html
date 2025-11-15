@@ -174,74 +174,27 @@
                 loadLeaderboard();
             }, []);
 
-            const loadLeaderboard = async () => {
+            const loadLeaderboard = () => {
                 try {
-                    // Intentar usar storage de Claude primero
-                    if (window.storage) {
-                        const result = await window.storage.list('player:', true);
-                        if (result && result.keys) {
-                            const players = await Promise.all(
-                                result.keys.map(async (key) => {
-                                    const data = await window.storage.get(key, true);
-                                    return data ? JSON.parse(data.value) : null;
-                                })
-                            );
-                            const validPlayers = players.filter(p => p !== null);
-                            validPlayers.sort((a, b) => b.totalScore - a.totalScore);
-                            setLeaderboard(validPlayers.slice(0, 10));
-                            return;
-                        }
-                    }
-                    
-                    // Fallback a localStorage
                     const localData = localStorage.getItem('superiorGameLeaderboard');
                     if (localData) {
                         const players = JSON.parse(localData);
                         players.sort((a, b) => b.totalScore - a.totalScore);
                         setLeaderboard(players.slice(0, 10));
+                    } else {
+                        setLeaderboard([]);
                     }
                 } catch (error) {
-                    console.log('Loading from localStorage');
-                    const localData = localStorage.getItem('superiorGameLeaderboard');
-                    if (localData) {
-                        const players = JSON.parse(localData);
-                        players.sort((a, b) => b.totalScore - a.totalScore);
-                        setLeaderboard(players.slice(0, 10));
-                    }
+                    console.error('Error loading leaderboard:', error);
+                    setLeaderboard([]);
                 }
             };
 
-            const savePlayerScore = async (name, score, level) => {
+            const savePlayerScore = (name, score, level) => {
                 try {
                     const userId = telegramUser?.id || name.toLowerCase().replace(/\s/g, '_');
                     
-                    // Intentar usar storage de Claude primero
-                    if (window.storage) {
-                        const playerKey = `player:${userId}`;
-                        let playerData = { name, totalScore: score, maxLevel: level, gamesPlayed: 1, lastPlayed: Date.now() };
-                        
-                        try {
-                            const existing = await window.storage.get(playerKey, true);
-                            if (existing) {
-                                const oldData = JSON.parse(existing.value);
-                                // Solo guardar si es un nuevo récord
-                                const newHighScore = Math.max(oldData.totalScore, score);
-                                playerData = {
-                                    name,
-                                    totalScore: newHighScore,
-                                    maxLevel: Math.max(oldData.maxLevel, level),
-                                    gamesPlayed: oldData.gamesPlayed + 1,
-                                    lastPlayed: Date.now()
-                                };
-                            }
-                        } catch (e) {}
-                        
-                        await window.storage.set(playerKey, JSON.stringify(playerData), true);
-                        loadLeaderboard();
-                        return;
-                    }
-                    
-                    // Fallback a localStorage
+                    // Cargar datos actuales
                     const localData = localStorage.getItem('superiorGameLeaderboard');
                     let players = localData ? JSON.parse(localData) : [];
                     
@@ -268,7 +221,7 @@
                     localStorage.setItem('superiorGameLeaderboard', JSON.stringify(players));
                     loadLeaderboard();
                 } catch (error) {
-                    console.log('Could not save score:', error);
+                    console.error('Could not save score:', error);
                 }
             };
 
