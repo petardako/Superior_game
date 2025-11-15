@@ -6,6 +6,11 @@
     <title>SUPERIOR GAME - Cardano Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -14,6 +19,21 @@
     <div id="root"></div>
 
     <script type="text/babel">
+        // Inicializar Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDrbmaBOZAx2AL-NjrWm0tIGscea7YL-SM",
+            authDomain: "superior-game-c6b8e.firebaseapp.com",
+            databaseURL: "https://superior-game-c6b8e-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "superior-game-c6b8e",
+            storageBucket: "superior-game-c6b8e.firebasestorage.app",
+            messagingSenderId: "878162337220",
+            appId: "1:878162337220:web:cf6b18b7bf7e9ccc349891"
+        };
+
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
         const { useState, useEffect } = React;
 
         const Gamepad2 = () => (
@@ -175,52 +195,67 @@
 
             const loadLeaderboard = () => {
                 try {
-                    const localData = localStorage.getItem('superiorGameLeaderboard');
-                    if (localData) {
-                        const players = JSON.parse(localData);
+                    // Cargar desde Firebase Realtime Database
+                    const leaderboardRef = database.ref('leaderboard');
+                    
+                    leaderboardRef.orderByChild('totalScore').limitToLast(10).once('value', (snapshot) => {
+                        const players = [];
+                        snapshot.forEach((childSnapshot) => {
+                            players.push(childSnapshot.val());
+                        });
+                        
+                        // Ordenar de mayor a menor puntuación
                         players.sort((a, b) => b.totalScore - a.totalScore);
-                        setLeaderboard(players.slice(0, 10));
-                    } else {
-                        setLeaderboard([]);
-                    }
+                        setLeaderboard(players);
+                    });
                 } catch (error) {
-                    console.error('Error loading leaderboard:', error);
+                    console.error('Error loading leaderboard from Firebase:', error);
                     setLeaderboard([]);
                 }
             };
 
             const savePlayerScore = (name, score, level) => {
                 try {
-                    const userId = telegramUser?.id || name.toLowerCase().replace(/\s/g, '_');
+                    const userId = telegramUser?.id || `user_${name.toLowerCase().replace(/\s/g, '_')}`;
+                    const playerRef = database.ref('leaderboard/' + userId);
                     
-                    // Cargar datos actuales
-                    const localData = localStorage.getItem('superiorGameLeaderboard');
-                    let players = localData ? JSON.parse(localData) : [];
-                    
-                    const existingIndex = players.findIndex(p => p.id === userId);
-                    
-                    if (existingIndex >= 0) {
-                        // Solo actualizar si es un nuevo récord
-                        const newHighScore = Math.max(players[existingIndex].totalScore, score);
-                        players[existingIndex].totalScore = newHighScore;
-                        players[existingIndex].maxLevel = Math.max(players[existingIndex].maxLevel, level);
-                        players[existingIndex].gamesPlayed += 1;
-                        players[existingIndex].lastPlayed = Date.now();
-                    } else {
-                        players.push({
+                    // Primero verificar si el jugador ya existe
+                    playerRef.once('value', (snapshot) => {
+                        const existingData = snapshot.val();
+                        
+                        let playerData = {
                             id: userId,
-                            name,
+                            name: name,
                             totalScore: score,
                             maxLevel: level,
                             gamesPlayed: 1,
                             lastPlayed: Date.now()
+                        };
+                        
+                        if (existingData) {
+                            // Solo actualizar si es un nuevo récord
+                            playerData = {
+                                id: userId,
+                                name: name,
+                                totalScore: Math.max(existingData.totalScore, score),
+                                maxLevel: Math.max(existingData.maxLevel, level),
+                                gamesPlayed: existingData.gamesPlayed + 1,
+                                lastPlayed: Date.now()
+                            };
+                        }
+                        
+                        // Guardar en Firebase
+                        playerRef.set(playerData, (error) => {
+                            if (error) {
+                                console.error('Error saving to Firebase:', error);
+                            } else {
+                                console.log('✅ Score saved to Firebase successfully!');
+                                loadLeaderboard();
+                            }
                         });
-                    }
-                    
-                    localStorage.setItem('superiorGameLeaderboard', JSON.stringify(players));
-                    loadLeaderboard();
+                    });
                 } catch (error) {
-                    console.error('Could not save score:', error);
+                    console.error('Error in savePlayerScore:', error);
                 }
             };
 
