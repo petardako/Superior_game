@@ -77,58 +77,57 @@
 
             const allQuestions = [
                 { question: "What is Cardano?", options: ["A cryptocurrency", "A blockchain platform", "A wallet", "An exchange"], correct: 1, explanation: "Cardano is a third-generation blockchain platform designed for smart contracts and decentralized applications." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "Who founded Cardano?", options: ["Vitalik Buterin", "Charles Hoskinson", "Gavin Wood", "Satoshi Nakamoto"], correct: 1, explanation: "Charles Hoskinson, co-founder of Ethereum, created Cardano with a scientific approach." },
                 { question: "What consensus algorithm does Cardano use?", options: ["Proof of Work", "Proof of Stake", "Proof of Authority", "Delegated PoS"], correct: 1, explanation: "Cardano uses Ouroboros, a Proof of Stake protocol that's energy efficient." },
                 { question: "What year was Cardano launched?", options: ["2015", "2017", "2019", "2021"], correct: 1, explanation: "Cardano was officially launched in September 2017." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "How many layers does Cardano's architecture have?", options: ["1", "2", "3", "4"], correct: 1, explanation: "Cardano has CSL (Settlement Layer) and CCL (Computation Layer)." },
                 { question: "What does CSL stand for?", options: ["Cardano Smart Layer", "Cardano Settlement Layer", "Cardano Security Layer", "Cardano System Layer"], correct: 1, explanation: "CSL handles ADA transactions and the ledger." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What does CCL stand for?", options: ["Cardano Computing Layer", "Cardano Computation Layer", "Cardano Contract Layer", "Cardano Code Layer"], correct: 1, explanation: "CCL is responsible for smart contracts and dApps." },
                 { question: "What accounting model does Cardano use?", options: ["Account-based", "UTXO", "Balance-based", "Token-based"], correct: 1, explanation: "Cardano uses Extended UTXO (eUTXO) model for better security." },
                 { question: "What makes Cardano's UTXO model unique?", options: ["It's faster", "It's extended (eUTXO)", "It's cheaper", "It's simpler"], correct: 1, explanation: "eUTXO adds smart contract capabilities to Bitcoin's UTXO model." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What programming language does Cardano use for smart contracts?", options: ["Solidity", "Rust", "Plutus", "JavaScript"], correct: 2, explanation: "Plutus is based on Haskell and designed for formal verification." },
                 { question: "What update brought smart contracts to Cardano?", options: ["Shelley", "Alonzo", "Goguen", "Basho"], correct: 1, explanation: "The Alonzo hard fork in September 2021 enabled smart contracts." },
                 { question: "What language is Plutus based on?", options: ["Python", "Java", "Haskell", "C++"], correct: 2, explanation: "Plutus is built on Haskell, a functional programming language." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What is Marlowe?", options: ["A wallet", "A language for financial contracts", "An exchange", "A token"], correct: 1, explanation: "Marlowe is a domain-specific language for financial smart contracts." },
                 { question: "What's the advantage of functional programming for smart contracts?", options: ["It's faster", "Better formal verification", "Easier to learn", "More popular"], correct: 1, explanation: "Functional programming allows mathematical proof of correctness." },
                 { question: "What is a Stake Pool?", options: ["A mining pool", "A validator node", "A wallet type", "A token"], correct: 1, explanation: "Stake Pools validate transactions and produce blocks on Cardano." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What is delegation in Cardano?", options: ["Sending ADA", "Assigning stake to a pool", "Creating a wallet", "Mining"], correct: 1, explanation: "Delegation allows ADA holders to participate in staking without running a node." },
                 { question: "Do you lose control of your ADA when staking?", options: ["Yes, completely", "No, ADA stays in your wallet", "Only partially", "Depends on the pool"], correct: 1, explanation: "Your ADA never leaves your wallet when delegating to a stake pool." },
                 { question: "What is an epoch in Cardano?", options: ["1 day", "5 days", "1 month", "1 year"], correct: 1, explanation: "An epoch is approximately 5 days (432,000 slots)." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What are staking rewards paid in?", options: ["Bitcoin", "Ethereum", "ADA", "USD"], correct: 2, explanation: "Staking rewards are paid in ADA from transaction fees and monetary expansion." },
                 { question: "What is Project Catalyst?", options: ["A wallet", "A governance system", "A DEX", "A bridge"], correct: 1, explanation: "Project Catalyst is Cardano's decentralized governance and funding mechanism." },
                 { question: "How do you vote in Catalyst?", options: ["With ADA holdings", "One person one vote", "Through stake pools", "By mining"], correct: 0, explanation: "Voting power in Catalyst is proportional to ADA holdings." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What are Catalyst proposals called?", options: ["Projects", "Ideas", "Proposals", "All of the above"], correct: 3, explanation: "They're commonly called proposals or projects seeking funding." },
                 { question: "What does CIP stand for?", options: ["Cardano Implementation Proposal", "Cardano Improvement Proposal", "Cardano Innovation Protocol", "Cardano Investment Plan"], correct: 1, explanation: "CIPs are formal proposals for improving Cardano's protocol." },
                 { question: "Who can submit a CIP?", options: ["Only developers", "Only IOHK", "Anyone in the community", "Only stake pool operators"], correct: 2, explanation: "CIPs are open to anyone in the Cardano community." },
                 { question: "What was the Byron era about?", options: ["Foundation", "Decentralization", "Smart contracts", "Scaling"], correct: 0, explanation: "Byron established Cardano's foundation and basic functionality." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What did Shelley bring to Cardano?", options: ["Smart contracts", "Decentralization", "Scaling", "Governance"], correct: 1, explanation: "Shelley enabled decentralized block production through stake pools." },
                 { question: "What is the Goguen era focused on?", options: ["Decentralization", "Smart contracts", "Scaling", "Interoperability"], correct: 1, explanation: "Goguen brought smart contract capabilities via Plutus and Marlowe." },
                 { question: "What will Basho improve?", options: ["Security", "Decentralization", "Scaling and optimization", "Governance"], correct: 2, explanation: "Basho focuses on scaling through sidechains and optimization." },
                 { question: "What is Voltaire about?", options: ["Smart contracts", "Scaling", "Governance and sustainability", "Interoperability"], correct: 2, explanation: "Voltaire will complete Cardano's self-governing system." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What is Hydra?", options: ["A wallet", "A layer 2 scaling solution", "A staking protocol", "A DEX"], correct: 1, explanation: "Hydra is Cardano's layer 2 protocol for massive scalability." },
                 { question: "What is Mithril?", options: ["A token", "A stake-based signature scheme", "A wallet", "A DEX"], correct: 1, explanation: "Mithril enables fast bootstrapping and light clients." },
                 { question: "What are Native Assets?", options: ["Tokens requiring smart contracts", "First-class tokens on Cardano", "NFTs only", "Stablecoins"], correct: 1, explanation: "Native Assets are treated like ADA at the protocol level." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "Do Native Assets require smart contracts?", options: ["Yes, always", "No, they're built-in", "Only for complex tokens", "Depends on the type"], correct: 1, explanation: "Native Assets are handled by the ledger itself, no smart contracts needed." },
                 { question: "What is a Cardano sidechain?", options: ["A layer 2 solution", "A separate blockchain", "Both A and B", "A wallet type"], correct: 2, explanation: "Sidechains are independent blockchains connected to Cardano's mainchain." },
                 { question: "Which three organizations develop Cardano?", options: ["IOG, CF, Emurgo", "IOHK, Binance, Coinbase", "IOG, Ethereum, Polkadot", "Only IOHK"], correct: 0, explanation: "Input Output (IOG), Cardano Foundation, and Emurgo collaborate on development." },
                 { question: "What is IOG's role?", options: ["Marketing only", "Research and development", "Only funding", "Running stake pools"], correct: 1, explanation: "IOG (formerly IOHK) handles research, development, and engineering." },
-                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
                 { question: "What does the Cardano Foundation do?", options: ["Development", "Adoption and standards", "Mining", "Trading"], correct: 1, explanation: "The Foundation oversees ecosystem development and adoption." },
                 { question: "What is Emurgo's focus?", options: ["Research", "Commercial adoption", "Governance", "Mining"], correct: 1, explanation: "Emurgo focuses on commercial ventures and enterprise adoption." },
                 { question: "Is Cardano development centralized?", options: ["Yes, only IOHK", "No, multiple organizations", "Yes, fully centralized", "No governance exists"], correct: 1, explanation: "Three entities plus community governance ensure decentralization." },
                 { question: "What is Ouroboros Praos?", options: ["A wallet", "An improved consensus protocol", "A DEX", "A token"], correct: 1, explanation: "Praos is an enhanced version of Ouroboros with better security." },
-                { question: "What does 'peer-reviewed' mean for Cardano?", options: ["Fast development", "Academic scrutiny", "Community voting", "No testing needed"], correct: 1, explanation: "Cardano's research undergoes academic peer review before implementation." }
+                { question: "What does 'peer-reviewed' mean for Cardano?", options: ["Fast development", "Academic scrutiny", "Community voting", "No testing needed"], correct: 1, explanation: "Cardano's research undergoes academic peer review before implementation." },
+                { question: "What is the maximum supply of ADA?", options: ["21 million", "45 billion", "100 billion", "Unlimited"], correct: 1, explanation: "Cardano has a maximum supply of 45 billion ADA tokens." },
+                { question: "What is the ticker symbol for Cardano?", options: ["BTC", "ETH", "ADA", "DOT"], correct: 2, explanation: "ADA is the native cryptocurrency of the Cardano blockchain." },
+                { question: "What makes Cardano environmentally friendly?", options: ["Uses solar power", "Proof of Stake consensus", "Cloud mining", "No transactions"], correct: 1, explanation: "Cardano's Proof of Stake uses significantly less energy than Proof of Work." },
+                { question: "What is a Cardano wallet?", options: ["A physical wallet", "Software to store ADA", "A mining device", "An exchange"], correct: 1, explanation: "A Cardano wallet is software that allows you to store, send, and receive ADA." },
+                { question: "Which wallet is official for Cardano?", options: ["MetaMask", "Daedalus", "Trust Wallet", "Exodus"], correct: 1, explanation: "Daedalus is the official full-node wallet developed by IOG." },
+                { question: "What is Yoroi?", options: ["A DEX", "A light wallet", "A stake pool", "A token"], correct: 1, explanation: "Yoroi is a light wallet for Cardano developed by Emurgo." },
+                { question: "What is minimum ADA for staking?", options: ["1 ADA", "10 ADA", "100 ADA", "No minimum"], correct: 3, explanation: "There's no minimum ADA required to start staking on Cardano." },
+                { question: "How often are staking rewards distributed?", options: ["Daily", "Every epoch (~5 days)", "Monthly", "Yearly"], correct: 1, explanation: "Staking rewards are distributed at the end of each epoch, approximately every 5 days." },
+                { question: "Which meme coins help grow the Cardano ecosystem?", options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], correct: 3, explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." },
+                { question: "What is a smart contract?", options: ["A legal document", "Self-executing code", "A wallet type", "A mining algorithm"], correct: 1, explanation: "Smart contracts are self-executing programs that run on the blockchain." },
+                { question: "What are dApps?", options: ["Mobile apps", "Decentralized applications", "Download apps", "Developer apps"], correct: 1, explanation: "dApps are decentralized applications that run on blockchain technology." }
             ];
 
             // Fisher-Yates shuffle
@@ -229,41 +228,27 @@
                 // Mezclar todas las preguntas
                 const shuffled = shuffleArray(allQuestions);
                 
-                // Eliminar duplicados basados en el texto de la pregunta
-                const uniqueQuestions = [];
-                const seenQuestions = new Set();
+                // Encontrar la pregunta de meme coins
+                const memeQuestion = shuffled.find(q => q.question.includes("Which meme coins help grow"));
                 
-                for (const q of shuffled) {
-                    if (!seenQuestions.has(q.question)) {
-                        uniqueQuestions.push(q);
-                        seenQuestions.add(q.question);
-                    }
-                }
+                // Filtrar para eliminar la pregunta de meme coins del array mezclado
+                const questionsWithoutMeme = shuffled.filter(q => q.question !== memeQuestion?.question);
                 
-                // IMPORTANTE: Asegurar que la pregunta de meme coins esté incluida (95% probabilidad)
-                const memeQuestion = { 
-                    question: "Which meme coins help grow the Cardano ecosystem?", 
-                    options: ["$SNEK 🐍", "$HOSKY 🐺", "$SUPERIOR ⚡", "All of them 🐍🐺⚡"], 
-                    correct: 3, 
-                    explanation: "All these meme coins contribute to growing the Cardano ecosystem! Each brings unique value and community engagement to ADA." 
-                };
-                
-                // Verificar si ya está en las preguntas únicas
-                const hasMemeQuestion = uniqueQuestions.some(q => q.question === memeQuestion.question);
-                
-                // Si no está, añadirla en una posición aleatoria temprana (95% de probabilidad)
-                if (!hasMemeQuestion && Math.random() < 0.95) {
-                    const insertPosition = Math.floor(Math.random() * Math.min(20, uniqueQuestions.length));
-                    uniqueQuestions.splice(insertPosition, 0, memeQuestion);
+                // Con 95% de probabilidad, insertar la pregunta de meme coins en las primeras 10 preguntas
+                let finalQuestions = [...questionsWithoutMeme];
+                if (memeQuestion && Math.random() < 0.95) {
+                    // Insertar en una posición aleatoria entre 0 y 9 (primeras 10 preguntas)
+                    const insertPosition = Math.floor(Math.random() * 10);
+                    finalQuestions.splice(insertPosition, 0, memeQuestion);
                 }
                 
                 // Mezclar las opciones de cada pregunta
-                const gameQuestions = uniqueQuestions.map(q => shuffleQuestionOptions(q));
+                const gameQuestions = finalQuestions.map(q => shuffleQuestionOptions(q));
                 
-                // Tomar las primeras 5 para el nivel 1
-                const questions = gameQuestions.slice(0, 5);
-                setLevelQuestions(questions);
-                setUsedQuestions(gameQuestions);
+                // Tomar las primeras 50 para el juego completo (10 niveles x 5 preguntas)
+                const questions = gameQuestions.slice(0, 50);
+                setLevelQuestions(questions.slice(0, 5));
+                setUsedQuestions(questions);
                 setGameState('playing');
                 setScore(0);
                 setLives(3);
