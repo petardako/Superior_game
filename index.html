@@ -19,7 +19,9 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        // Inicializar Firebase
+        // ═══════════════════════════════════════════════════════════════════
+        // FIREBASE CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════════
         const firebaseConfig = {
             apiKey: "AIzaSyDrbmaBOZAx2AL-NjrWm0tIGscea7YL-SM",
             authDomain: "superior-game-c6b8e.firebaseapp.com",
@@ -30,20 +32,14 @@
             appId: "1:878162337220:web:cf6b18b7bf7e9ccc349891"
         };
 
-        // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         const { useState, useEffect } = React;
 
-        const Gamepad2 = () => (
-            <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                <line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/>
-                <line x1="15" y1="13" x2="15.01" y2="13"/><line x1="18" y1="11" x2="18.01" y2="11"/>
-                <rect x="2" y="6" width="20" height="12" rx="2"/>
-            </svg>
-        );
-
+        // ═══════════════════════════════════════════════════════════════════
+        // SVG ICONS
+        // ═══════════════════════════════════════════════════════════════════
         const Trophy = () => (
             <svg width="100%" height="100%" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
@@ -78,23 +74,36 @@
             </svg>
         );
 
+        // ═══════════════════════════════════════════════════════════════════
+        // MAIN COMPONENT
+        // ═══════════════════════════════════════════════════════════════════
         const SuperiorGame = () => {
+            // Game State
             const [gameState, setGameState] = useState('loading');
             const [playerName, setPlayerName] = useState('');
             const [telegramUser, setTelegramUser] = useState(null);
+            
+            // Game Progress
             const [score, setScore] = useState(0);
+            const [totalScore, setTotalScore] = useState(0);
             const [lives, setLives] = useState(3);
             const [level, setLevel] = useState(1);
             const [currentQuestion, setCurrentQuestion] = useState(0);
             const [questionsInLevel, setQuestionsInLevel] = useState(0);
             const [streak, setStreak] = useState(0);
-            const [startTime, setStartTime] = useState(null);
-            const [leaderboard, setLeaderboard] = useState([]);
-            const [totalScore, setTotalScore] = useState(0);
+            
+            // Questions
             const [levelQuestions, setLevelQuestions] = useState([]);
-            const [responseTime, setResponseTime] = useState(0);
             const [usedQuestions, setUsedQuestions] = useState([]);
+            
+            // UI State
+            const [startTime, setStartTime] = useState(null);
+            const [responseTime, setResponseTime] = useState(0);
+            const [leaderboard, setLeaderboard] = useState([]);
 
+            // ═══════════════════════════════════════════════════════════════
+            // QUESTIONS DATABASE
+            // ═══════════════════════════════════════════════════════════════
             const allQuestions = [
                 { question: "What is Cardano?", options: ["A cryptocurrency", "A blockchain platform", "A wallet", "An exchange"], correct: 1, explanation: "Cardano is a third-generation blockchain platform designed for smart contracts and decentralized applications." },
                 { question: "Who founded Cardano?", options: ["Vitalik Buterin", "Charles Hoskinson", "Gavin Wood", "Satoshi Nakamoto"], correct: 1, explanation: "Charles Hoskinson, co-founder of Ethereum, created Cardano with a scientific approach." },
@@ -150,7 +159,11 @@
                 { question: "What are dApps?", options: ["Mobile apps", "Decentralized applications", "Download apps", "Developer apps"], correct: 1, explanation: "dApps are decentralized applications that run on blockchain technology." }
             ];
 
-            // Fisher-Yates shuffle
+            // ═══════════════════════════════════════════════════════════════
+            // UTILITY FUNCTIONS
+            // ═══════════════════════════════════════════════════════════════
+            
+            // Fisher-Yates shuffle algorithm
             const shuffleArray = (arr) => {
                 const array = [...arr];
                 let currentIndex = array.length;
@@ -162,7 +175,7 @@
                 return array;
             };
 
-            // Shuffle question options
+            // Shuffle question options and adjust correct answer index
             const shuffleQuestionOptions = (question) => {
                 const indices = [0, 1, 2, 3];
                 const shuffledIndices = shuffleArray(indices);
@@ -174,7 +187,11 @@
                 };
             };
 
+            // ═══════════════════════════════════════════════════════════════
+            // INITIALIZATION
+            // ═══════════════════════════════════════════════════════════════
             useEffect(() => {
+                // Get Telegram user info
                 let username = 'Player';
                 let tgUser = null;
                 
@@ -190,11 +207,9 @@
                 
                 setPlayerName(username);
                 setTelegramUser(tgUser);
-                
-                // Cargar leaderboard
                 loadLeaderboard();
                 
-                // Verificar progreso guardado DESPUÉS de establecer el usuario
+                // Check for saved progress after Firebase is ready
                 setTimeout(() => {
                     const userId = tgUser?.id || `user_${username.toLowerCase().replace(/\s/g, '_')}`;
                     const progressRef = database.ref('progress/' + userId);
@@ -203,11 +218,10 @@
                         const progress = snapshot.val();
                         
                         if (progress && progress.lives > 0) {
-                            // Verificar si es reciente (menos de 24 horas)
+                            // Check if progress is recent (< 24 hours)
                             const twentyFourHours = 24 * 60 * 60 * 1000;
                             if (Date.now() - progress.savedAt < twentyFourHours) {
-                                console.log('📥 Progress found:', progress);
-                                // Cargar estados del progreso
+                                // Load all progress states
                                 setScore(progress.score || 0);
                                 setTotalScore(progress.totalScore || 0);
                                 setLives(progress.lives || 3);
@@ -217,41 +231,36 @@
                                 setStreak(progress.streak || 0);
                                 setUsedQuestions(progress.usedQuestions || []);
                                 setLevelQuestions(progress.levelQuestions || []);
-                                
-                                // Ir a pantalla de continuar
                                 setGameState('continue');
-                                console.log('✅ Loaded continue screen with', progress.totalScore, 'points');
                             } else {
-                                // Progreso antiguo, eliminarlo
+                                // Old progress, remove it
                                 progressRef.remove();
                                 setGameState('menu');
                             }
                         } else {
-                            // No hay progreso
-                            console.log('ℹ️ No saved progress found');
                             setGameState('menu');
                         }
                     });
-                }, 500); // Esperar 500ms para asegurar que Firebase esté listo
+                }, 500);
             }, []);
 
+            // ═══════════════════════════════════════════════════════════════
+            // FIREBASE FUNCTIONS
+            // ═══════════════════════════════════════════════════════════════
+            
             const loadLeaderboard = () => {
                 try {
-                    // Cargar desde Firebase Realtime Database
                     const leaderboardRef = database.ref('leaderboard');
-                    
                     leaderboardRef.orderByChild('totalScore').limitToLast(10).once('value', (snapshot) => {
                         const players = [];
                         snapshot.forEach((childSnapshot) => {
                             players.push(childSnapshot.val());
                         });
-                        
-                        // Ordenar de mayor a menor puntuación
                         players.sort((a, b) => b.totalScore - a.totalScore);
                         setLeaderboard(players);
                     });
                 } catch (error) {
-                    console.error('Error loading leaderboard from Firebase:', error);
+                    console.error('Error loading leaderboard:', error);
                     setLeaderboard([]);
                 }
             };
@@ -261,7 +270,6 @@
                     const userId = telegramUser?.id || `user_${name.toLowerCase().replace(/\s/g, '_')}`;
                     const playerRef = database.ref('leaderboard/' + userId);
                     
-                    // Primero verificar si el jugador ya existe
                     playerRef.once('value', (snapshot) => {
                         const existingData = snapshot.val();
                         
@@ -275,7 +283,6 @@
                         };
                         
                         if (existingData) {
-                            // Solo actualizar si es un nuevo récord
                             playerData = {
                                 id: userId,
                                 name: name,
@@ -286,93 +293,50 @@
                             };
                         }
                         
-                        // Guardar en Firebase
                         playerRef.set(playerData, (error) => {
-                            if (error) {
-                                console.error('Error saving to Firebase:', error);
-                            } else {
-                                console.log('✅ Score saved to Firebase successfully!');
+                            if (!error) {
                                 loadLeaderboard();
                             }
                         });
                     });
                 } catch (error) {
-                    console.error('Error in savePlayerScore:', error);
+                    console.error('Error saving score:', error);
                 }
             };
 
-            // Nueva función para cargar progreso guardado
-            const loadGameProgress = (callback) => {
-                try {
-                    const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
-                    const progressRef = database.ref('progress/' + userId);
-                    
-                    progressRef.once('value', (snapshot) => {
-                        const progress = snapshot.val();
-                        
-                        if (progress) {
-                            // Verificar si el progreso es reciente (menos de 24 horas)
-                            const twentyFourHours = 24 * 60 * 60 * 1000;
-                            if (Date.now() - progress.savedAt < twentyFourHours) {
-                                callback(progress);
-                            } else {
-                                // Progreso muy antiguo, eliminarlo
-                                progressRef.remove();
-                                callback(null);
-                            }
-                        } else {
-                            callback(null);
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error loading progress:', error);
-                    callback(null);
-                }
-            };
-
-            // Nueva función para eliminar progreso guardado
             const clearGameProgress = () => {
                 try {
                     const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
-                    const progressRef = database.ref('progress/' + userId);
-                    progressRef.remove();
-                    console.log('🗑️ Game progress cleared!');
+                    database.ref('progress/' + userId).remove();
                 } catch (error) {
                     console.error('Error clearing progress:', error);
                 }
             };
 
+            // ═══════════════════════════════════════════════════════════════
+            // GAME LOGIC
+            // ═══════════════════════════════════════════════════════════════
+            
             const startGame = () => {
-                // Empezar juego nuevo directamente
                 startNewGame();
             };
 
             const startNewGame = () => {
-                // Limpiar cualquier progreso anterior
                 clearGameProgress();
                 
-                // Mezclar todas las preguntas
                 const shuffled = shuffleArray(allQuestions);
-                
-                // Encontrar la pregunta de meme coins
                 const memeQuestion = shuffled.find(q => q.question.includes("Which meme coins help grow"));
-                
-                // Filtrar para eliminar la pregunta de meme coins del array mezclado
                 const questionsWithoutMeme = shuffled.filter(q => q.question !== memeQuestion?.question);
                 
-                // Con 95% de probabilidad, insertar la pregunta de meme coins en las primeras 10 preguntas
                 let finalQuestions = [...questionsWithoutMeme];
                 if (memeQuestion && Math.random() < 0.95) {
-                    // Insertar en una posición aleatoria entre 0 y 9 (primeras 10 preguntas)
                     const insertPosition = Math.floor(Math.random() * 10);
                     finalQuestions.splice(insertPosition, 0, memeQuestion);
                 }
                 
-                // Mezclar las opciones de cada pregunta
                 const gameQuestions = finalQuestions.map(q => shuffleQuestionOptions(q));
-                
-                // Tomar las primeras 50 para el juego completo (10 niveles x 5 preguntas)
                 const questions = gameQuestions.slice(0, 50);
+                
                 setLevelQuestions(questions.slice(0, 5));
                 setUsedQuestions(questions);
                 setGameState('playing');
@@ -388,26 +352,9 @@
             };
 
             const continueGame = () => {
-                loadGameProgress((progress) => {
-                    if (progress) {
-                        // Cargar todos los estados del progreso guardado
-                        setUsedQuestions(progress.usedQuestions || []);
-                        setLevelQuestions(progress.levelQuestions || []);
-                        setScore(progress.score || 0);
-                        setTotalScore(progress.totalScore || 0);
-                        setLives(progress.lives || 3);
-                        setLevel(progress.level || 1);
-                        setCurrentQuestion(progress.currentQuestion || 0);
-                        setQuestionsInLevel(progress.questionsInLevel || 0);
-                        setStreak(progress.streak || 0);
-                        setResponseTime(0);
-                        setStartTime(Date.now());
-                        setGameState('playing');
-                        console.log('🎮 Game continued from saved progress!');
-                    } else {
-                        startNewGame();
-                    }
-                });
+                setGameState('playing');
+                setStartTime(Date.now());
+                setResponseTime(0);
             };
 
             const handleAnswer = (selectedIndex) => {
@@ -430,8 +377,6 @@
                     setTotalScore(totalScore + points);
                     setStreak(streak + 1);
                     setGameState('correct');
-                    
-                    // NO guardar aquí - esperamos a nextQuestion
                 } else {
                     setLives(lives - 1);
                     setStreak(0);
@@ -439,14 +384,12 @@
                     
                     if (lives - 1 === 0) {
                         setTimeout(() => {
-                            // Limpiar progreso guardado cuando pierdes
                             clearGameProgress();
                             savePlayerScore(playerName, totalScore, level);
                             setGameState('gameover');
                         }, 2000);
                         return;
                     }
-                    // NO guardar aquí tampoco
                 }
             };
 
@@ -458,70 +401,76 @@
                     if (level < 10) {
                         setGameState('levelup');
                     } else {
-                        // Juego completado, limpiar progreso
                         clearGameProgress();
                         savePlayerScore(playerName, totalScore, 10);
                         setGameState('victory');
                     }
                 } else {
-                    // Calcular los nuevos valores
                     const newQuestionIndex = currentQuestion + 1;
                     
-                    // Actualizar estados
                     setQuestionsInLevel(newQuestionsInLevel);
                     setCurrentQuestion(newQuestionIndex);
                     setStartTime(Date.now());
                     setResponseTime(0);
                     setGameState('playing');
                     
-                    // Guardar EXPLÍCITAMENTE con los nuevos valores calculados
+                    // Save progress with calculated values
                     setTimeout(() => {
                         const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
-                        const progressRef = database.ref('progress/' + userId);
-                        
-                        progressRef.set({
+                        database.ref('progress/' + userId).set({
                             userId: userId,
                             playerName: playerName,
                             score: score,
                             lives: lives,
                             level: level,
-                            currentQuestion: newQuestionIndex, // Valor ya calculado
-                            questionsInLevel: newQuestionsInLevel, // Valor ya calculado
+                            currentQuestion: newQuestionIndex,
+                            questionsInLevel: newQuestionsInLevel,
                             streak: streak,
                             totalScore: totalScore,
                             savedAt: Date.now(),
                             usedQuestions: usedQuestions,
                             levelQuestions: levelQuestions
                         });
-                        console.log('💾 Question saved:', newQuestionIndex, '| Total:', totalScore, '| Lives:', lives);
                     }, 200);
                 }
             };
 
             const goToNextLevel = () => {
                 const newLevel = level + 1;
-                // Tomar las siguientes 5 preguntas de las ya mezcladas
                 const startIdx = (newLevel - 1) * 5;
                 const questions = usedQuestions.slice(startIdx, startIdx + 5);
                 
                 setLevelQuestions(questions);
                 setLevel(newLevel);
                 setCurrentQuestion(0);
+                setGameState('playing');
                 setStartTime(Date.now());
                 setResponseTime(0);
-                setGameState('playing');
                 
-                // Guardar EXPLÍCITAMENTE con los nuevos valores
+                // Save progress
                 setTimeout(() => {
-                    saveGameProgress({
+                    const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
+                    database.ref('progress/' + userId).set({
+                        userId: userId,
+                        playerName: playerName,
+                        score: score,
+                        lives: lives,
                         level: newLevel,
                         currentQuestion: 0,
                         questionsInLevel: 0,
+                        streak: streak,
+                        totalScore: totalScore,
+                        savedAt: Date.now(),
+                        usedQuestions: usedQuestions,
                         levelQuestions: questions
                     });
-                }, 100);
+                }, 200);
             };
 
+            // ═══════════════════════════════════════════════════════════════
+            // RENDER FUNCTIONS
+            // ═══════════════════════════════════════════════════════════════
+            
             const renderMenu = () => (
                 <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full">
@@ -758,8 +707,8 @@
             const renderLevelUp = () => (
                 <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-                        <div className="w-24 h-24 mx-auto mb-6 animate-bounce">
-                            <div className="text-yellow-500"><Trophy /></div>
+                        <div className="w-24 h-24 mx-auto mb-6 animate-bounce text-yellow-500">
+                            <Trophy />
                         </div>
                         
                         <h2 className="text-4xl font-bold text-gray-800 mb-4">Level {level} Complete! 🎉</h2>
@@ -931,6 +880,9 @@
                 </div>
             );
 
+            // ═══════════════════════════════════════════════════════════════
+            // MAIN RENDER
+            // ═══════════════════════════════════════════════════════════════
             return (
                 <>
                     {gameState === 'loading' && (
