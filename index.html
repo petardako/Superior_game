@@ -265,23 +265,27 @@
                     const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
                     const progressRef = database.ref('progress/' + userId);
                     
-                    const progressData = {
-                        userId: userId,
-                        playerName: playerName,
-                        score: score,
-                        lives: lives,
-                        level: level,
-                        currentQuestion: currentQuestion,
-                        questionsInLevel: questionsInLevel,
-                        streak: streak,
-                        totalScore: totalScore,
-                        savedAt: Date.now(),
-                        usedQuestions: usedQuestions,
-                        levelQuestions: levelQuestions
-                    };
-                    
-                    progressRef.set(progressData);
-                    console.log('💾 Game progress saved!');
+                    // Usar una función para obtener los valores actuales del estado
+                    // React puede tener valores desactualizados en closures
+                    setTimeout(() => {
+                        const progressData = {
+                            userId: userId,
+                            playerName: playerName,
+                            score: score,
+                            lives: lives,
+                            level: level,
+                            currentQuestion: currentQuestion,
+                            questionsInLevel: questionsInLevel,
+                            streak: streak,
+                            totalScore: totalScore,
+                            savedAt: Date.now(),
+                            usedQuestions: usedQuestions,
+                            levelQuestions: levelQuestions
+                        };
+                        
+                        progressRef.set(progressData);
+                        console.log('💾 Game progress saved!', progressData);
+                    }, 0);
                 } catch (error) {
                     console.error('Error saving progress:', error);
                 }
@@ -384,18 +388,19 @@
             const continueGame = () => {
                 loadGameProgress((progress) => {
                     if (progress) {
-                        setScore(progress.score);
-                        setLives(progress.lives);
-                        setLevel(progress.level);
-                        setCurrentQuestion(progress.currentQuestion);
-                        setQuestionsInLevel(progress.questionsInLevel);
-                        setStreak(progress.streak);
-                        setTotalScore(progress.totalScore);
+                        // Cargar todos los estados del progreso guardado
                         setUsedQuestions(progress.usedQuestions || []);
                         setLevelQuestions(progress.levelQuestions || []);
-                        setGameState('playing');
-                        setStartTime(Date.now());
+                        setScore(progress.score || 0);
+                        setTotalScore(progress.totalScore || 0);
+                        setLives(progress.lives || 3);
+                        setLevel(progress.level || 1);
+                        setCurrentQuestion(progress.currentQuestion || 0);
+                        setQuestionsInLevel(progress.questionsInLevel || 0);
+                        setStreak(progress.streak || 0);
                         setResponseTime(0);
+                        setStartTime(Date.now());
+                        setGameState('playing');
                         console.log('🎮 Game continued from saved progress!');
                     } else {
                         startNewGame();
@@ -423,6 +428,8 @@
                     setTotalScore(totalScore + points);
                     setStreak(streak + 1);
                     setGameState('correct');
+                    
+                    // NO guardar aquí - esperamos a nextQuestion
                 } else {
                     setLives(lives - 1);
                     setStreak(0);
@@ -437,6 +444,7 @@
                         }, 2000);
                         return;
                     }
+                    // NO guardar aquí tampoco
                 }
             };
 
@@ -446,9 +454,8 @@
                 if (newQuestionsInLevel >= 5) {
                     setQuestionsInLevel(0);
                     if (level < 10) {
-                        // Guardar progreso antes de subir de nivel
-                        saveGameProgress();
                         setGameState('levelup');
+                        // NO guardar aquí, se guarda en goToNextLevel
                     } else {
                         // Juego completado, limpiar progreso
                         clearGameProgress();
@@ -456,13 +463,19 @@
                         setGameState('victory');
                     }
                 } else {
+                    // PRIMERO avanzar a la siguiente pregunta
+                    const newQuestionIndex = currentQuestion + 1;
                     setQuestionsInLevel(newQuestionsInLevel);
-                    setCurrentQuestion(currentQuestion + 1);
+                    setCurrentQuestion(newQuestionIndex);
                     setGameState('playing');
                     setStartTime(Date.now());
                     setResponseTime(0);
-                    // Guardar progreso después de cada pregunta
-                    saveGameProgress();
+                    
+                    // DESPUÉS guardar progreso (ya con la nueva pregunta)
+                    // Usar setTimeout para asegurar que los estados se actualicen primero
+                    setTimeout(() => {
+                        saveGameProgress();
+                    }, 100);
                 }
             };
 
@@ -477,8 +490,11 @@
                 setGameState('playing');
                 setStartTime(Date.now());
                 setResponseTime(0);
-                // Guardar progreso al empezar nuevo nivel
-                saveGameProgress();
+                
+                // Guardar progreso DESPUÉS de que todo esté configurado
+                setTimeout(() => {
+                    saveGameProgress();
+                }, 100);
             };
 
             const renderMenu = () => (
@@ -534,9 +550,7 @@
             const renderContinue = () => (
                 <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center p-4">
                     <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-md w-full text-center">
-                        <div className="w-20 h-20 mx-auto mb-6 text-blue-500">
-                            <Gamepad2 />
-                        </div>
+                        <img src="https://i.imgur.com/W0XeBvj.png" alt="Logo" className="w-20 h-20 mx-auto rounded-full mb-4 object-cover" />
                         
                         <h2 className="text-3xl font-bold text-gray-800 mb-4">Continue Game? 🎮</h2>
                         <p className="text-gray-600 mb-6">You have a saved game in progress!</p>
@@ -550,7 +564,7 @@
                                 <div className="text-center">
                                     <div className="flex gap-1 justify-center mb-1">
                                         {[...Array(3)].map((_, i) => (
-                                            <div key={i} className={`w-6 h-6 ${i < lives ? 'text-red-500' : 'text-gray-300'}`}>
+                                            <div key={i} className={`w-6 h-6 ${i < lives ? 'text-blue-500' : 'text-gray-300'}`}>
                                                 <Heart filled={i < lives} />
                                             </div>
                                         ))}
