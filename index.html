@@ -175,19 +175,39 @@
             };
 
             useEffect(() => {
+                let username = 'Player';
+                let tgUser = null;
+                
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
                     tg.ready();
                     const user = tg.initDataUnsafe?.user;
                     if (user) {
-                        const username = user.username || `${user.first_name || 'User'}${user.last_name ? ' ' + user.last_name : ''}`;
-                        setPlayerName(username);
-                        setTelegramUser(user);
+                        username = user.username || `${user.first_name || 'User'}${user.last_name ? ' ' + user.last_name : ''}`;
+                        tgUser = user;
+                    }
+                }
+                
+                setPlayerName(username);
+                setTelegramUser(tgUser);
+                
+                // Cargar leaderboard
+                loadLeaderboard();
+                
+                // Verificar progreso guardado DESPUÉS de establecer el usuario
+                setTimeout(() => {
+                    const userId = tgUser?.id || `user_${username.toLowerCase().replace(/\s/g, '_')}`;
+                    const progressRef = database.ref('progress/' + userId);
+                    
+                    progressRef.once('value', (snapshot) => {
+                        const progress = snapshot.val();
                         
-                        // Verificar si hay progreso guardado y mostrar directamente pantalla de continuar
-                        loadGameProgress((progress) => {
-                            if (progress && progress.lives > 0) {
-                                // Cargar los datos del progreso en los estados
+                        if (progress && progress.lives > 0) {
+                            // Verificar si es reciente (menos de 24 horas)
+                            const twentyFourHours = 24 * 60 * 60 * 1000;
+                            if (Date.now() - progress.savedAt < twentyFourHours) {
+                                console.log('📥 Progress found:', progress);
+                                // Cargar estados del progreso
                                 setScore(progress.score || 0);
                                 setTotalScore(progress.totalScore || 0);
                                 setLives(progress.lives || 3);
@@ -195,24 +215,24 @@
                                 setCurrentQuestion(progress.currentQuestion || 0);
                                 setQuestionsInLevel(progress.questionsInLevel || 0);
                                 setStreak(progress.streak || 0);
+                                setUsedQuestions(progress.usedQuestions || []);
+                                setLevelQuestions(progress.levelQuestions || []);
                                 
-                                // Ir directamente a pantalla de continuar
+                                // Ir a pantalla de continuar
                                 setGameState('continue');
+                                console.log('✅ Loaded continue screen with', progress.totalScore, 'points');
                             } else {
-                                // No hay progreso, mostrar menú normal
+                                // Progreso antiguo, eliminarlo
+                                progressRef.remove();
                                 setGameState('menu');
                             }
-                        });
-                    } else {
-                        setPlayerName('Player');
-                        setGameState('menu');
-                    }
-                } else {
-                    setPlayerName('Player');
-                    setGameState('menu');
-                }
-                
-                loadLeaderboard();
+                        } else {
+                            // No hay progreso
+                            console.log('ℹ️ No saved progress found');
+                            setGameState('menu');
+                        }
+                    });
+                }, 500); // Esperar 500ms para asegurar que Firebase esté listo
             }, []);
 
             const loadLeaderboard = () => {
