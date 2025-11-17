@@ -259,38 +259,6 @@
                 }
             };
 
-            // Nueva función para guardar progreso actual del juego
-            const saveGameProgress = () => {
-                try {
-                    const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
-                    const progressRef = database.ref('progress/' + userId);
-                    
-                    // Usar una función para obtener los valores actuales del estado
-                    // React puede tener valores desactualizados en closures
-                    setTimeout(() => {
-                        const progressData = {
-                            userId: userId,
-                            playerName: playerName,
-                            score: score,
-                            lives: lives,
-                            level: level,
-                            currentQuestion: currentQuestion,
-                            questionsInLevel: questionsInLevel,
-                            streak: streak,
-                            totalScore: totalScore,
-                            savedAt: Date.now(),
-                            usedQuestions: usedQuestions,
-                            levelQuestions: levelQuestions
-                        };
-                        
-                        progressRef.set(progressData);
-                        console.log('💾 Game progress saved!', progressData);
-                    }, 0);
-                } catch (error) {
-                    console.error('Error saving progress:', error);
-                }
-            };
-
             // Nueva función para cargar progreso guardado
             const loadGameProgress = (callback) => {
                 try {
@@ -455,7 +423,6 @@
                     setQuestionsInLevel(0);
                     if (level < 10) {
                         setGameState('levelup');
-                        // NO guardar aquí, se guarda en goToNextLevel
                     } else {
                         // Juego completado, limpiar progreso
                         clearGameProgress();
@@ -463,19 +430,37 @@
                         setGameState('victory');
                     }
                 } else {
-                    // PRIMERO avanzar a la siguiente pregunta
+                    // Calcular los nuevos valores
                     const newQuestionIndex = currentQuestion + 1;
+                    
+                    // Actualizar estados
                     setQuestionsInLevel(newQuestionsInLevel);
                     setCurrentQuestion(newQuestionIndex);
-                    setGameState('playing');
                     setStartTime(Date.now());
                     setResponseTime(0);
+                    setGameState('playing');
                     
-                    // DESPUÉS guardar progreso (ya con la nueva pregunta)
-                    // Usar setTimeout para asegurar que los estados se actualicen primero
+                    // Guardar EXPLÍCITAMENTE con los nuevos valores calculados
                     setTimeout(() => {
-                        saveGameProgress();
-                    }, 100);
+                        const userId = telegramUser?.id || `user_${playerName.toLowerCase().replace(/\s/g, '_')}`;
+                        const progressRef = database.ref('progress/' + userId);
+                        
+                        progressRef.set({
+                            userId: userId,
+                            playerName: playerName,
+                            score: score,
+                            lives: lives,
+                            level: level,
+                            currentQuestion: newQuestionIndex, // Valor ya calculado
+                            questionsInLevel: newQuestionsInLevel, // Valor ya calculado
+                            streak: streak,
+                            totalScore: totalScore,
+                            savedAt: Date.now(),
+                            usedQuestions: usedQuestions,
+                            levelQuestions: levelQuestions
+                        });
+                        console.log('💾 Question saved:', newQuestionIndex, '| Total:', totalScore, '| Lives:', lives);
+                    }, 200);
                 }
             };
 
@@ -484,16 +469,22 @@
                 // Tomar las siguientes 5 preguntas de las ya mezcladas
                 const startIdx = (newLevel - 1) * 5;
                 const questions = usedQuestions.slice(startIdx, startIdx + 5);
+                
                 setLevelQuestions(questions);
                 setLevel(newLevel);
                 setCurrentQuestion(0);
-                setGameState('playing');
                 setStartTime(Date.now());
                 setResponseTime(0);
+                setGameState('playing');
                 
-                // Guardar progreso DESPUÉS de que todo esté configurado
+                // Guardar EXPLÍCITAMENTE con los nuevos valores
                 setTimeout(() => {
-                    saveGameProgress();
+                    saveGameProgress({
+                        level: newLevel,
+                        currentQuestion: 0,
+                        questionsInLevel: 0,
+                        levelQuestions: questions
+                    });
                 }, 100);
             };
 
