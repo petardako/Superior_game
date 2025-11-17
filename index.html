@@ -79,7 +79,7 @@
         );
 
         const SuperiorGame = () => {
-            const [gameState, setGameState] = useState('menu');
+            const [gameState, setGameState] = useState('loading');
             const [playerName, setPlayerName] = useState('');
             const [telegramUser, setTelegramUser] = useState(null);
             const [score, setScore] = useState(0);
@@ -183,11 +183,33 @@
                         const username = user.username || `${user.first_name || 'User'}${user.last_name ? ' ' + user.last_name : ''}`;
                         setPlayerName(username);
                         setTelegramUser(user);
+                        
+                        // Verificar si hay progreso guardado y mostrar directamente pantalla de continuar
+                        loadGameProgress((progress) => {
+                            if (progress && progress.lives > 0) {
+                                // Cargar los datos del progreso en los estados
+                                setScore(progress.score || 0);
+                                setTotalScore(progress.totalScore || 0);
+                                setLives(progress.lives || 3);
+                                setLevel(progress.level || 1);
+                                setCurrentQuestion(progress.currentQuestion || 0);
+                                setQuestionsInLevel(progress.questionsInLevel || 0);
+                                setStreak(progress.streak || 0);
+                                
+                                // Ir directamente a pantalla de continuar
+                                setGameState('continue');
+                            } else {
+                                // No hay progreso, mostrar menú normal
+                                setGameState('menu');
+                            }
+                        });
                     } else {
                         setPlayerName('Player');
+                        setGameState('menu');
                     }
                 } else {
                     setPlayerName('Player');
+                    setGameState('menu');
                 }
                 
                 loadLeaderboard();
@@ -301,16 +323,8 @@
             };
 
             const startGame = () => {
-                // Verificar si hay progreso guardado
-                loadGameProgress((progress) => {
-                    if (progress && progress.lives > 0) {
-                        // Hay un progreso guardado, preguntar si quiere continuar
-                        setGameState('continue');
-                    } else {
-                        // No hay progreso o ya perdió, empezar juego nuevo
-                        startNewGame();
-                    }
-                });
+                // Empezar juego nuevo directamente
+                startNewGame();
             };
 
             const startNewGame = () => {
@@ -899,6 +913,11 @@
 
             return (
                 <>
+                    {gameState === 'loading' && (
+                        <div className="min-h-screen bg-gradient-to-br from-blue-900 via-blue-700 to-cyan-600 flex items-center justify-center">
+                            <div className="text-white text-xl">Loading...</div>
+                        </div>
+                    )}
                     {gameState === 'menu' && renderMenu()}
                     {gameState === 'continue' && renderContinue()}
                     {gameState === 'playing' && renderPlaying()}
